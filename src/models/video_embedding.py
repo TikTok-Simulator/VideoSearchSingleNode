@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List, Tuple
 
 from twelvelabs.models.embed import EmbeddingsTask
@@ -9,8 +10,10 @@ from ..utils.process_video import upscale_video_resolution
 class VideoEmbeddingModel:
     def __init__(self):
         self.twelvelabs_client = twelvelabs_client
-    
-    def generate_embedding_url(self, video_url: str) -> Tuple[List[Dict], EmbeddingsTask]:
+
+    def generate_embedding_url(
+        self, video_url: str
+    ) -> Tuple[List[Dict], EmbeddingsTask]:
         """
         Generate embeddings for a given video URL using the Twelve Labs API.
 
@@ -39,21 +42,19 @@ class VideoEmbeddingModel:
         # Create an embedding task
         # NOTE: Please upload a video with resolution between 360p(360x360) and 2160p(3840x2160).
         task = self.twelvelabs_client.embed.task.create(
-            model_name=model_name,
-            video_url=video_url
+            model_name=model_name, video_url=video_url
         )
-        print(f"Created task: id={task.id} model_name={task.model_name} status={task.status}")
+        logging.info(
+            f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
+        )
 
         # Define a callback function to monitor task progress
         def on_task_update(task: EmbeddingsTask):
-            print(f"  Status={task.status}")
+            logging.info(f"  Status={task.status}")
 
         # Wait for the task to complete
-        status = task.wait_for_done(
-            sleep_interval=2,
-            callback=on_task_update
-        )
-        print(f"Embedding done: {status}")
+        status = task.wait_for_done(sleep_interval=2, callback=on_task_update)
+        logging.info(f"Embedding done: {status}")
 
         # Retrieve the task result
         task_result = self.twelvelabs_client.embed.task.retrieve(task.id)
@@ -61,16 +62,20 @@ class VideoEmbeddingModel:
         # Extract and return the embeddings
         embeddings = []
         for v in task_result.video_embedding.segments:
-            embeddings.append({
-                'embeddings_float': v.embeddings_float,
-                'start_offset_sec': v.start_offset_sec,
-                'end_offset_sec': v.end_offset_sec,
-                'embedding_scope': v.embedding_scope
-            })
-        
+            embeddings.append(
+                {
+                    "embeddings_float": v.embeddings_float,
+                    "start_offset_sec": v.start_offset_sec,
+                    "end_offset_sec": v.end_offset_sec,
+                    "embedding_scope": v.embedding_scope,
+                }
+            )
+
         return embeddings, task_result
-        
-    def generate_embedding_file(self, video_file: str):
+
+    def generate_embedding_file(
+        self, video_file: str
+    ) -> Tuple[List[Dict], EmbeddingsTask]:
         """
         Generate embeddings for a given video file using the Twelve Labs API.
 
@@ -99,21 +104,19 @@ class VideoEmbeddingModel:
         # Create an embedding task
         # NOTE: Please upload a video with resolution between 360p(360x360) and 2160p(3840x2160).
         task = self.twelvelabs_client.embed.task.create(
-            model_name=model_name,
-            video_file=video_file
+            model_name=model_name, video_file=video_file
         )
-        print(f"Created task: id={task.id} model_name={task.model_name} status={task.status}")
+        logging.info(
+            f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
+        )
 
         # Define a callback function to monitor task progress
         def on_task_update(task: EmbeddingsTask):
-            print(f"  Status={task.status}")
+            logging.info(f"  Status={task.status}")
 
         # Wait for the task to complete
-        status = task.wait_for_done(
-            sleep_interval=2,
-            callback=on_task_update
-        )
-        print(f"Embedding done: {status}")
+        status = task.wait_for_done(sleep_interval=2, callback=on_task_update)
+        logging.info(f"Embedding done: {status}")
 
         # Retrieve the task result
         task_result = self.twelvelabs_client.embed.task.retrieve(task.id)
@@ -121,13 +124,15 @@ class VideoEmbeddingModel:
         # Extract and return the embeddings
         embeddings = []
         for v in task_result.video_embedding.segments:
-            embeddings.append({
-                'embeddings_float': v.embeddings_float,
-                'start_offset_sec': v.start_offset_sec,
-                'end_offset_sec': v.end_offset_sec,
-                'embedding_scope': v.embedding_scope
-            })
-        
+            embeddings.append(
+                {
+                    "embeddings_float": v.embeddings_float,
+                    "start_offset_sec": v.start_offset_sec,
+                    "end_offset_sec": v.end_offset_sec,
+                    "embedding_scope": v.embedding_scope,
+                }
+            )
+
         return embeddings, task_result
 
     def preprocess_video(self, video_url: str) -> str:

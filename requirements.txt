@@ -1,3 +1,5 @@
 dotenv
 twelvelabs
 pymilvus
+opencv-python
+requests
