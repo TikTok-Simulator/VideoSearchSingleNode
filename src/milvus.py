@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from pymilvus import MilvusClient
 
@@ -37,6 +37,30 @@ class MilvusDatabase:
             collection_name=collection_name, data=data
         )
         return insert_result
+
+    def query(self, **kwargs):
+        return self.milvus_client.query(**kwargs)
+
+    def retrieve_similarity(
+        self,
+        collection_name: str,
+        query_vectors: List[List[float]],
+        limit: int = 10,
+        output_fields: Optional[List[str]] = None,
+        **kwargs,
+    ) -> List[Dict]:
+        search_results = self.milvus_client.search(
+            collection_name=collection_name,
+            data=query_vectors,
+            limit=limit,
+            output_fields=output_fields,
+            **kwargs,
+        )
+
+        if not len(search_results):
+            return None
+
+        return search_results[0]
 
 
 def insert_task_output_to_milvus(

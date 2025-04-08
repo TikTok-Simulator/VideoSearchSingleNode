@@ -18,3 +18,8 @@ class TextEmbedding(BaseModel):
 class TaskOutput(BaseModel):
     video_embeddings: List[VideoEmbedding] = Field(default_factory=list)
     text_embedding: Optional[TextEmbedding] = None
+
+
+class RetrievalOutput(BaseModel):
+    videos: List[str] = Field(default_factory=list)
+    text_list: List[str] = Field(default=[])

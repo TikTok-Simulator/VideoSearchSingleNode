@@ -1,6 +1,9 @@
-import cv2
-import urllib.request
+import logging
 import os
+import urllib.request
+
+import cv2
+import ffmpeg
 
 
 def upscale_video_resolution(
@@ -91,3 +94,14 @@ def upscale_video_resolution(
         f"Video upscaled to {target_width}x{target_height} and saved to {output_path}"
     )
     return output_path
+
+
+def get_video_duration(video_source: str):
+    try:
+        probe = ffmpeg.probe(video_source)
+        duration = float(probe["format"]["duration"])  # duration in seconds
+    except ffmpeg.Error as e:
+        logging.error(f"Error: {e.stderr.decode()}")
+        return None
+
+    return duration

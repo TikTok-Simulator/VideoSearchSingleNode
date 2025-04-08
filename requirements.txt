@@ -3,3 +3,4 @@ twelvelabs
 pymilvus
 opencv-python
 requests
+ffmpeg-python

@@ -1,10 +1,10 @@
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from twelvelabs.models.embed import EmbeddingsTask
 
 from .core import model_name, twelvelabs_client
-from ..utils.process_video import upscale_video_resolution
+from ..utils.process_video import upscale_video_resolution, get_video_duration
 
 
 class VideoEmbeddingModel:
@@ -40,10 +40,23 @@ class VideoEmbeddingModel:
         """
 
         # Create an embedding task
-        # NOTE: Please upload a video with resolution between 360p(360x360) and 2160p(3840x2160).
-        task = self.twelvelabs_client.embed.task.create(
-            model_name=model_name, video_url=video_url
-        )
+        video_duration = get_video_duration(video_url)
+
+        if not video_duration:
+            task = self.twelvelabs_client.embed.task.create(
+                model_name=model_name,
+                video_url=video_url,
+                video_embedding_scopes=["clip", "video"],
+            )
+        else:
+            task = self.twelvelabs_client.embed.task.create(
+                model_name=model_name,
+                video_url=video_url,
+                video_start_offset_sec=0,
+                video_end_offset_sec=video_duration,
+                video_embedding_scopes=["clip", "video"],
+            )
+
         logging.info(
             f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
         )
@@ -99,13 +112,34 @@ class VideoEmbeddingModel:
         Raises:
             Any exceptions raised by the Twelve Labs API during task creation,
             execution, or retrieval.
+
+        Notes:
+            - Video resolution: Must be at least 360x360 and must not exceed 3840x2160.
+            - Aspect ratio: Must be one of 1:1, 4:3, 4:5, 5:4, 16:9, or 9:16.
+            - Video and audio formats: The video files must be encoded in the video and audio formats listed on the FFmpeg Formats Documentation
+            page. For videos in other formats, contact us at support@twelvelabs.io.
+            - Duration: Must be between 4 seconds and 2 hours (7,200s).
+            - File size: Must not exceed 2 GB.
         """
 
         # Create an embedding task
-        # NOTE: Please upload a video with resolution between 360p(360x360) and 2160p(3840x2160).
-        task = self.twelvelabs_client.embed.task.create(
-            model_name=model_name, video_file=video_file
-        )
+        video_duration = get_video_duration(video_file)
+
+        if not video_duration:
+            task = self.twelvelabs_client.embed.task.create(
+                model_name=model_name,
+                video_file=video_file,
+                video_embedding_scopes=["clip", "video"],
+            )
+        else:
+            task = self.twelvelabs_client.embed.task.create(
+                model_name=model_name,
+                video_file=video_file,
+                video_start_offset_sec=0,
+                video_end_offset_sec=video_duration,
+                video_embedding_scopes=["clip", "video"],
+            )
+
         logging.info(
             f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
         )

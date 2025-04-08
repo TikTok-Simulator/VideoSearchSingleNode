@@ -6,7 +6,7 @@ from ..utils.validate_video import is_valid_video_url, is_valid_video_file
 
 class TaskInput(BaseModel):
     video: str
-    video_type: str = Field(default=None)  # Public field, initialized as None
+    video_type: str = Field(default="file")
     text: str
 
     @model_validator(mode="after")
