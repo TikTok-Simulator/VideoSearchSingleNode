@@ -58,7 +58,7 @@ class MilvusDatabase:
         )
 
         if not len(search_results):
-            return None
+            return []
 
         return search_results[0]
 

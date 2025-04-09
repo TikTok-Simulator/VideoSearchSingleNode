@@ -59,3 +59,27 @@ After building the database, a video file/URL and an optional text description c
 python3 run.py
 ```
 
+## Integration
+To run entire services as a consistency system. Please clone two more repositories as follow architecture:
+```bash
+Milvus-Setup/
+    - docker-compose.yml
+    - main.py
+src
+static
+video-fetch-and-trim/
+    - main.py
+    - requirements.txt
+.gitignore
+build_database.py
+run.py
+.env        <---- You have to add environment variables here
+```
+
+```bash
+# .env
+HUGGING_FACE_TOKEN=<HUGGING_FACE_TOKEN>
+CATEGORY=Education # check out https://github.com/TikTok-Simulator/video-fetch-and-trim?tab=readme-ov-file#list-of-categories
+MAX_VIDEOS_PER_CATEGORY=10
+TWELVE_LABS_API_KEY=<TWELVE_LABS_API_KEY>
+```

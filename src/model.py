@@ -61,7 +61,7 @@ class MultimodalEmbeddingModel:
         video_collection_name: str,
         text_collection_name: str,
         limit: int = 10,
-    ) -> List[str]:
+    ) -> RetrievalOutput:
         task_output = self.generate_embedding(input)
         video_embeddings_float = [
             embedding.embeddings_float
