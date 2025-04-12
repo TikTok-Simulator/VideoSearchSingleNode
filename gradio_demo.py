@@ -72,6 +72,11 @@ def retrieve_related_videos(video_url: str):
     ]
 
 
+# def stream_video(video_path):
+#     # Stream logic here
+#     yield video_path
+
+
 with gr.Blocks(js=custom_js) as demo:
     gr.Markdown("## TikTok2 Simulator Recommended Videos")
 
@@ -83,7 +88,7 @@ with gr.Blocks(js=custom_js) as demo:
             loop=True,
             interactive=False,
             elem_id="video-display",
-            # streaming=True, # TODO
+            # streaming=True,  # TODO
         )
 
     # Button to load the next video from the list.
@@ -95,6 +100,7 @@ with gr.Blocks(js=custom_js) as demo:
     with gr.Row():
         for i, video_path in enumerate(video_list[:N_VIDEOS]):
             with gr.Column():
+                video_text_box = gr.Textbox(value=video_path, visible=False)
                 recommended_videos_display += [
                     gr.Video(
                         elem_id=f"recommended-video-{i}",
@@ -102,14 +108,14 @@ with gr.Blocks(js=custom_js) as demo:
                         label=None,
                         autoplay=True,
                         loop=True,
-                        interactive=True,
+                        interactive=False,
                         show_label=False,
-                        # streaming=True, # TODO
+                        # streaming=True,  # TODO
                     )
                 ]
                 gr.Button(f"▶ Video {i + 1}", elem_id=f"select-btn-{i}").click(
                     fn=update_display_video,
-                    inputs=[recommended_videos_display[-1]],
+                    inputs=[video_text_box],
                     outputs=video_display,
                 )
 
