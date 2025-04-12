@@ -1,18 +1,28 @@
 import random
 import gradio as gr
-import time
+from gradio_main import main
+
+# Paths can be a list of strings or pathlib.Path objects
+# corresponding to filenames or directories.
+# https://www.gradio.app/docs/gradio/set_static_paths
+# !Important, if you do not define like that, a file will be located in a temp and uncontrolled path
+gr.set_static_paths(paths=["video-fetch-and-trim/videos/"])
 
 video_list = [
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",# too long :v
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",# too long :v
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",# too long :v
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4", # too long :v
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", # too long :v
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",  # too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  # 15s
+    "video-fetch-and-trim/videos/education_0.mp4",  # local
+    "video-fetch-and-trim/videos/education_1.mp4",  # local
+    "video-fetch-and-trim/videos/education_2.mp4",  # local
+    "video-fetch-and-trim/videos/education_3.mp4",  # local
 ]
 
 N_VIDEOS = 4
@@ -64,10 +74,12 @@ def update_display_video(video_url: str):
 
 def retrieve_related_videos(video_url: str):
     global video_list
-    # Shuffle video_list
-    video_list = random.sample(video_list, len(video_list))
-    indices = random.sample(range(N_VIDEOS), N_VIDEOS)
-    time.sleep(5)
+
+    retrieved_videos = main(video_url=video_url)
+    video_list = retrieved_videos.videos
+    n_videos = min(len(video_list), N_VIDEOS)
+
+    indices = random.sample(range(n_videos), n_videos)
     return [
         gr.update(elem_id=f"recommended-video-{i}", value=video_list[vi])
         for i, vi in enumerate(indices)

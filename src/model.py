@@ -1,4 +1,4 @@
-from typing import List
+import logging
 
 from .models.video_embedding import VideoEmbeddingModel
 from .models.text_embedding import TextEmbeddingModel
@@ -88,17 +88,40 @@ class MultimodalEmbeddingModel:
         text_collection_name: str,
         limit: int = 10,
     ) -> RetrievalOutput:
+        logging.info(f"Retrieving similarity from milvus for the video {input.video}")
+        print(f"Retrieving similarity from milvus for the video {input.video}")
+
         # Replace generate input video into filter due to
         # the video already exist in our system and had been embedded
-        task_output = self.query_embedding_node(
-            input, milvus, video_collection_name, limit=10
-        )
+        def _query():
+            task_output = self.query_embedding_node(
+                input, milvus, video_collection_name, limit=10
+            )
 
-        video_embeddings_float = [
-            embedding.embeddings_float
-            for embedding in task_output.video_embeddings
-            if embedding.embedding_scope == "video" and embedding.video == input.video
-        ]
+            video_embeddings_float = [
+                embedding.embeddings_float
+                for embedding in task_output.video_embeddings
+                if embedding.embedding_scope == "video"
+                # and embedding.video == input.video
+            ]
+            return task_output, video_embeddings_float
+
+        def _generate():
+            task_output = self.generate_embedding(input=input)
+
+            video_embeddings_float = [
+                embedding.embeddings_float
+                for embedding in task_output.video_embeddings
+                if embedding.embedding_scope == "video"
+                # and embedding.video == input.video
+            ]
+            return task_output, video_embeddings_float
+
+        task_output, video_embeddings_float = _query()
+
+        if not video_embeddings_float:
+            logging.warning("Query not found => Generating the embedding")
+            task_output, video_embeddings_float = _generate()
 
         if not video_embeddings_float:
             raise ValueError("Error when generating video embedding")
