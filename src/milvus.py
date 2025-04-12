@@ -41,6 +41,25 @@ class MilvusDatabase:
     def query(self, **kwargs):
         return self.milvus_client.query(**kwargs)
 
+    def query_by_metadata(
+        self,
+        collection_name: str,
+        filter_metadata: str,
+        limit: int = 10,
+        output_fields: Optional[List[str]] = None,
+        **kwargs,
+    ) -> List[Dict]:
+        query_results = self.milvus_client.query(
+            collection_name,
+            filter=filter_metadata,
+            output_fields=output_fields,
+            limit=limit,
+        )
+        if not len(query_results):
+            return []
+
+        return query_results
+
     def retrieve_similarity(
         self,
         collection_name: str,

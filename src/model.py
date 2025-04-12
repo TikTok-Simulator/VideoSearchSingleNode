@@ -54,6 +54,32 @@ class MultimodalEmbeddingModel:
         except Exception as e:
             raise e
 
+    def query_embedding_node(
+        self,
+        input: TaskInput,
+        milvus: MilvusDatabase,
+        video_collection_name: str,
+        limit: int = 10,
+    ) -> TaskOutput:
+        video_embeddings = milvus.query_by_metadata(
+            collection_name=video_collection_name,
+            filter_metadata=f'video=="{input.video}"',
+            output_fields=None,
+            limit=limit,
+        )
+        video_embeddings_extended = [
+            {
+                **dict_,
+            }
+            for _, dict_ in enumerate(video_embeddings)
+        ]
+        output_data = {
+            "video_embeddings": video_embeddings_extended,
+            "text_embedding": None,
+        }
+
+        return TaskOutput(**output_data)
+
     def retrieve_similarity_from_milvus(
         self,
         input: TaskInput,
@@ -62,11 +88,16 @@ class MultimodalEmbeddingModel:
         text_collection_name: str,
         limit: int = 10,
     ) -> RetrievalOutput:
-        task_output = self.generate_embedding(input)
+        # Replace generate input video into filter due to
+        # the video already exist in our system and had been embedded
+        task_output = self.query_embedding_node(
+            input, milvus, video_collection_name, limit=10
+        )
+
         video_embeddings_float = [
             embedding.embeddings_float
             for embedding in task_output.video_embeddings
-            if embedding.embedding_scope == "video"
+            if embedding.embedding_scope == "video" and embedding.video == input.video
         ]
 
         if not video_embeddings_float:
