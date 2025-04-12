@@ -1,5 +1,6 @@
 import random
 import gradio as gr
+import time
 
 video_list = [
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",# too long :v
@@ -66,6 +67,7 @@ def retrieve_related_videos(video_url: str):
     # Shuffle video_list
     video_list = random.sample(video_list, len(video_list))
     indices = random.sample(range(N_VIDEOS), N_VIDEOS)
+    time.sleep(5)
     return [
         gr.update(elem_id=f"recommended-video-{i}", value=video_list[vi])
         for i, vi in enumerate(indices)
@@ -100,7 +102,6 @@ with gr.Blocks(js=custom_js) as demo:
     with gr.Row():
         for i, video_path in enumerate(video_list[:N_VIDEOS]):
             with gr.Column():
-                video_text_box = gr.Textbox(value=video_path, visible=False)
                 recommended_videos_display += [
                     gr.Video(
                         elem_id=f"recommended-video-{i}",
@@ -115,7 +116,7 @@ with gr.Blocks(js=custom_js) as demo:
                 ]
                 gr.Button(f"▶ Video {i + 1}", elem_id=f"select-btn-{i}").click(
                     fn=update_display_video,
-                    inputs=[video_text_box],
+                    inputs=[recommended_videos_display[-1]],
                     outputs=video_display,
                 )
 
