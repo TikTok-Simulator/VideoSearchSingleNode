@@ -17,7 +17,7 @@ def basic_run(milvus: MilvusDatabase):
 
     # Define sample query data (video + description)
     # sample_video_url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
-    sample_video_file = "video-fetch-and-trim/videos/education_0.mp4"  # Can use wget to download the URL as local file
+    sample_video_file = "video-fetch-and-trim/videos/education_2.mp4"  # Can use wget to download the URL as local file
     sample_description = "A passionate and assertive sermon by Prophet Kofi Oduro, challenging societal norms and calling for boldness in faith."
     input_ = TaskInput(
         video=sample_video_file,
