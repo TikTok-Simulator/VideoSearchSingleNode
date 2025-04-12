@@ -4,3 +4,4 @@ pymilvus
 opencv-python
 requests
 ffmpeg-python
+gradio
