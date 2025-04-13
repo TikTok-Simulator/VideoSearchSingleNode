@@ -1,10 +1,14 @@
 import logging
+import os
+from urllib import request
 
-from .models.video_embedding import VideoEmbeddingModel
-from .models.text_embedding import TextEmbeddingModel
-from .schemas.input import TaskInput
-from .schemas.output import TaskOutput, RetrievalOutput
 from .milvus import MilvusDatabase
+from .models.text_embedding import TextEmbeddingModel
+from .models.video_embedding import VideoEmbeddingModel
+from .schemas.input import TaskInput
+from .schemas.output import RetrievalOutput, TaskOutput
+
+MILVUS_FILE_DIR = os.environ.get("MILVUS_FILE_DIR", "video-fetch-and-trim/videos")
 
 
 class MultimodalEmbeddingModel:
@@ -17,6 +21,13 @@ class MultimodalEmbeddingModel:
             video = input.video
 
             if input.video_type == "url":
+                # download video from url and save to MILVUS_FILE_DIR
+                video_file_path = os.path.join(MILVUS_FILE_DIR, os.path.basename(video))
+                request.urlretrieve(video, video_file_path)
+                video = video_file_path
+                logging.info(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+                print(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+
                 video_embeddings, _ = self.video_embedding_model.generate_embedding_url(
                     video
                 )
