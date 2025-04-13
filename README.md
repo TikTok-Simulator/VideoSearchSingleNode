@@ -93,3 +93,12 @@ GRADIO_TEMP_DIR=video-fetch-and-trim/videos # !important store the downloaded vi
 - `gradio_main.py`: contains exported function used to `gradio_demo.py`
 - `gradio_download.py`: test streaming video: download a video from the internet and concat to a local video until end
 - `gradio_stream.py`: test streaming video: streaming video by continious loading and displaying the local video
+
+
+## How to reset database
+```bash
+#!/bin/bash
+docker-compose down
+rm -rf ./volumes/etcd ./volumes/minio ./volumes/milvus
+docker-compose up -d
+```
