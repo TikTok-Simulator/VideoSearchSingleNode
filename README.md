@@ -83,3 +83,9 @@ CATEGORY=Education # check out https://github.com/TikTok-Simulator/video-fetch-a
 MAX_VIDEOS_PER_CATEGORY=10
 TWELVE_LABS_API_KEY=<TWELVE_LABS_API_KEY>
 ```
+
+## Gradio demo
+- `gradio_demo.py`: run `python gradio_demo.py` to start a demo UI 
+- `gradio_main.py`: contains exported function used to `gradio_demo.py`
+- `gradio_download.py`: test streaming video: download a video from the internet and concat to a local video until end
+- `gradio_stream.py`: test streaming video: streaming video by continious loading and displaying the local video

@@ -20,9 +20,9 @@ video_list = [
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",  # 15s
     # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  # 15s
     "video-fetch-and-trim/videos/education_0.mp4",  # local
-    "video-fetch-and-trim/videos/education_1.mp4",  # local
     "video-fetch-and-trim/videos/education_2.mp4",  # local
-    "video-fetch-and-trim/videos/education_3.mp4",  # local
+    "video-fetch-and-trim/videos/news & politics_0.mp4",  # local
+    "video-fetch-and-trim/videos/news & politics_1.mp4",  # local
 ]
 
 N_VIDEOS = 4

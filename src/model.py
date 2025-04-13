@@ -119,9 +119,10 @@ class MultimodalEmbeddingModel:
 
         task_output, video_embeddings_float = _query()
 
-        if not video_embeddings_float:
-            logging.warning("Query not found => Generating the embedding")
-            task_output, video_embeddings_float = _generate()
+        # TODO: used for user's uploaded videos (in future)
+        # if not video_embeddings_float:
+        #     logging.warning("Query not found => Generating the embedding")
+        #     task_output, video_embeddings_float = _generate()
 
         if not video_embeddings_float:
             raise ValueError("Error when generating video embedding")
@@ -149,4 +150,6 @@ class MultimodalEmbeddingModel:
             text_list = [text_result["entity"]["text"] for text_result in text_results]
             results["text_list"] = text_list
 
+        logging.info(f"Retrieved list of videos: {results['videos']}")
+        print(f"Retrieved list of videos: {results['videos']}")
         return RetrievalOutput(**results)
