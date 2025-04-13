@@ -1,13 +1,16 @@
+import json
 import os
 import random
-import json
+from itertools import chain
 from typing import Generator, Tuple
-from src.schemas.input import TaskInput
+
+from loguru import logger
+from tqdm import tqdm
+
+from src.milvus import MilvusDatabase, insert_task_output_to_milvus
 from src.model import MultimodalEmbeddingModel
 from src.schemas.base import VideoMetadata
-from src.milvus import MilvusDatabase, insert_task_output_to_milvus
-from tqdm import tqdm
-from itertools import chain
+from src.schemas.input import TaskInput
 
 VIDEO_FETCH_AND_TRIM_FOLDER_PATH = "video-fetch-and-trim"
 DB_URL = os.environ.get("DB_URL", "milvus_embedding.db")
@@ -104,7 +107,7 @@ def basic_build_database(milvus: MilvusDatabase):
             milvus, output, VIDEO_COLLECTION_NAME, TEXT_COLLECTION_NAME
         )
 
-    print("Build database successfully")
+    logger.info("Build database successfully")
 
 
 def main_build_database(milvus: MilvusDatabase):
@@ -130,7 +133,7 @@ def main_build_database(milvus: MilvusDatabase):
             # Calculate embeddings
             output = model.generate_embedding(input_)
         except Exception as e:
-            print(f"Error processing video {video_path}: {e}")
+            logger.info(f"Error processing video {video_path}: {e}")
             continue
 
         # Insert data into collections
@@ -138,7 +141,7 @@ def main_build_database(milvus: MilvusDatabase):
             milvus, output, VIDEO_COLLECTION_NAME, TEXT_COLLECTION_NAME
         )
 
-    print("Build database successfully")
+    logger.info("Build database successfully")
 
 
 if __name__ == "__main__":

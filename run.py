@@ -1,5 +1,5 @@
 import os
-import logging
+from loguru import logger
 from src.schemas.input import TaskInput
 from src.model import MultimodalEmbeddingModel
 from src.milvus import MilvusDatabase
@@ -8,7 +8,7 @@ DB_URL = os.environ.get("DB_URL", "milvus_embedding.db")
 VIDEO_COLLECTION_NAME = os.environ.get("VIDEO_COLLECTION_NAME", "video_embedding")
 TEXT_COLLECTION_NAME = os.environ.get("TEXT_COLLECTION_NAME", "text_embedding")
 
-logging.info("Retrieving data from Milvus database: %s", DB_URL)
+logger.info(f"Retrieving data from Milvus database: {DB_URL}")
 
 
 def basic_run(milvus: MilvusDatabase):

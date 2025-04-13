@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import Dict, List, Optional, Union
 
 from pymilvus import MilvusClient
@@ -16,7 +16,7 @@ class MilvusDatabase:
         # This is a quickstart to create a local vector database
         milvus_client = MilvusClient(db_name)
 
-        logging.info("Successfully connected to Milvus")
+        logger.info("Successfully connected to Milvus")
         return milvus_client
 
     def create_collection(self, collection_name: str = "twelvelabs_demo_collection"):
@@ -30,7 +30,7 @@ class MilvusDatabase:
             vector_field_name="embeddings_float",
         )
 
-        logging.info(f"Collection '{collection_name}' created successfully")
+        logger.info(f"Collection '{collection_name}' created successfully")
 
     def insert(self, collection_name: str, data: Union[Dict, List[Dict]]):
         insert_result = self.milvus_client.insert(
@@ -93,11 +93,11 @@ def insert_task_output_to_milvus(
     video_data = task_output_data["video_embeddings"]
     res = milvus.insert(video_collection_name, video_data)
     video_ids = res["ids"]
-    logging.info(f"Inserted video embeddings with IDs: {video_ids}")
+    logger.info(f"Inserted video embeddings with IDs: {video_ids}")
 
     if task_output_data["text_embedding"]:
         text_data = task_output_data["text_embedding"]
 
         res = milvus.insert(text_collection_name, text_data)
         text_ids = res["ids"]
-        logging.info(f"Inserted text embeddings with IDs: {text_ids}")
+        logger.info(f"Inserted text embeddings with IDs: {text_ids}")

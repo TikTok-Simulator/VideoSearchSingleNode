@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 import os
 import urllib.request
 
@@ -38,7 +38,7 @@ def upscale_video_resolution(
 
     # Check if upscaling is needed
     if original_width >= 360 and original_height >= 360:
-        print(
+        logger.info(
             "Video resolution is already sufficient (>= 360x360). No upscaling needed."
         )
         video.release()
@@ -90,7 +90,7 @@ def upscale_video_resolution(
     if os.path.exists(temp_path):
         os.remove(temp_path)
 
-    print(
+    logger.info(
         f"Video upscaled to {target_width}x{target_height} and saved to {output_path}"
     )
     return output_path
@@ -101,7 +101,7 @@ def get_video_duration(video_source: str):
         probe = ffmpeg.probe(video_source)
         duration = float(probe["format"]["duration"])  # duration in seconds
     except ffmpeg.Error as e:
-        logging.error(f"Error: {e.stderr.decode()}")
+        logger.error(f"Error: {e.stderr.decode()}")
         return None
 
     return duration

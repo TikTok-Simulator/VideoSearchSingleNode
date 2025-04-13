@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 import os
 from urllib import request
 
@@ -25,8 +25,8 @@ class MultimodalEmbeddingModel:
                 video_file_path = os.path.join(MILVUS_FILE_DIR, os.path.basename(video))
                 request.urlretrieve(video, video_file_path)
                 video = video_file_path
-                logging.info(f"Downloaded video from url to {MILVUS_FILE_DIR}")
-                print(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+                logger.info(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+                # print(f"Downloaded video from url to {MILVUS_FILE_DIR}")
 
                 video_embeddings, _ = self.video_embedding_model.generate_embedding_url(
                     video
@@ -99,8 +99,8 @@ class MultimodalEmbeddingModel:
         text_collection_name: str,
         limit: int = 10,
     ) -> RetrievalOutput:
-        logging.info(f"Retrieving similarity from milvus for the video {input.video}")
-        print(f"Retrieving similarity from milvus for the video {input.video}")
+        logger.info(f"Retrieving similarity from milvus for the video {input.video}")
+        # print(f"Retrieving similarity from milvus for the video {input.video}")
 
         # Replace generate input video into filter due to
         # the video already exist in our system and had been embedded
@@ -132,7 +132,7 @@ class MultimodalEmbeddingModel:
 
         # TODO: used for user's uploaded videos (in future)
         if not video_embeddings_float:
-            logging.warning("Query not found => Generating the embedding")
+            logger.warning("Query not found => Generating the embedding")
             task_output, video_embeddings_float = _generate()
 
         if not video_embeddings_float:
@@ -161,6 +161,6 @@ class MultimodalEmbeddingModel:
             text_list = [text_result["entity"]["text"] for text_result in text_results]
             results["text_list"] = text_list
 
-        logging.info(f"Retrieved list of videos: {results['videos']}")
-        print(f"Retrieved list of videos: {results['videos']}")
+        logger.info(f"Retrieved list of videos: {results['videos']}")
+        # print(f"Retrieved list of videos: {results['videos']}")
         return RetrievalOutput(**results)

@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from typing import Dict, List, Tuple, Optional
 
 from twelvelabs.models.embed import EmbeddingsTask
@@ -57,17 +57,17 @@ class VideoEmbeddingModel:
                 video_embedding_scopes=["clip", "video"],
             )
 
-        logging.info(
+        logger.info(
             f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
         )
 
         # Define a callback function to monitor task progress
         def on_task_update(task: EmbeddingsTask):
-            logging.info(f"  Status={task.status}")
+            logger.info(f"  Status={task.status}")
 
         # Wait for the task to complete
         status = task.wait_for_done(sleep_interval=2, callback=on_task_update)
-        logging.info(f"Embedding done: {status}")
+        logger.info(f"Embedding done: {status}")
 
         # Retrieve the task result
         task_result = self.twelvelabs_client.embed.task.retrieve(task.id)
@@ -75,14 +75,12 @@ class VideoEmbeddingModel:
         # Extract and return the embeddings
         embeddings = []
         for v in task_result.video_embedding.segments:
-            embeddings.append(
-                {
-                    "embeddings_float": v.embeddings_float,
-                    "start_offset_sec": v.start_offset_sec,
-                    "end_offset_sec": v.end_offset_sec,
-                    "embedding_scope": v.embedding_scope,
-                }
-            )
+            embeddings.append({
+                "embeddings_float": v.embeddings_float,
+                "start_offset_sec": v.start_offset_sec,
+                "end_offset_sec": v.end_offset_sec,
+                "embedding_scope": v.embedding_scope,
+            })
 
         return embeddings, task_result
 
@@ -140,17 +138,17 @@ class VideoEmbeddingModel:
                 video_embedding_scopes=["clip", "video"],
             )
 
-        logging.info(
+        logger.info(
             f"Created task: id={task.id} model_name={task.model_name} status={task.status}"
         )
 
         # Define a callback function to monitor task progress
         def on_task_update(task: EmbeddingsTask):
-            logging.info(f"  Status={task.status}")
+            logger.info(f"  Status={task.status}")
 
         # Wait for the task to complete
         status = task.wait_for_done(sleep_interval=2, callback=on_task_update)
-        logging.info(f"Embedding done: {status}")
+        logger.info(f"Embedding done: {status}")
 
         # Retrieve the task result
         task_result = self.twelvelabs_client.embed.task.retrieve(task.id)
@@ -158,14 +156,12 @@ class VideoEmbeddingModel:
         # Extract and return the embeddings
         embeddings = []
         for v in task_result.video_embedding.segments:
-            embeddings.append(
-                {
-                    "embeddings_float": v.embeddings_float,
-                    "start_offset_sec": v.start_offset_sec,
-                    "end_offset_sec": v.end_offset_sec,
-                    "embedding_scope": v.embedding_scope,
-                }
-            )
+            embeddings.append({
+                "embeddings_float": v.embeddings_float,
+                "start_offset_sec": v.start_offset_sec,
+                "end_offset_sec": v.end_offset_sec,
+                "embedding_scope": v.embedding_scope,
+            })
 
         return embeddings, task_result
 

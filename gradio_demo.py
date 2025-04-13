@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 import gradio as gr
 from gradio_main import main, init
 
@@ -13,8 +13,8 @@ N_VIDEOS = 4
 video_list = init(n_videos=N_VIDEOS)
 
 
-logging.info("Trending videos: %s", video_list)
-print("Trending videos: %s", video_list)
+logger.info(f"Trending videos: {video_list}")
+# print(f"Trending videos: {video_list}")
 
 # This JS will be injected once and run when the app loads
 custom_js = """
