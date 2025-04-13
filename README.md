@@ -82,6 +82,10 @@ HUGGING_FACE_TOKEN=<HUGGING_FACE_TOKEN>
 CATEGORY=Education # check out https://github.com/TikTok-Simulator/video-fetch-and-trim?tab=readme-ov-file#list-of-categories
 MAX_VIDEOS_PER_CATEGORY=10
 TWELVE_LABS_API_KEY=<TWELVE_LABS_API_KEY>
+DB_URL=http://localhost:19530
+VIDEO_COLLECTION_NAME=video_embedding
+TEXT_COLLECTION_NAME=text_embedding
+GRADIO_TEMP_DIR=video-fetch-and-trim/videos # !important store the downloaded video from internet url
 ```
 
 ## Gradio demo

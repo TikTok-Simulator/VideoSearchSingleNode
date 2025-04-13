@@ -102,7 +102,7 @@ class MultimodalEmbeddingModel:
                 embedding.embeddings_float
                 for embedding in task_output.video_embeddings
                 if embedding.embedding_scope == "video"
-                # and embedding.video == input.video
+                and embedding.video == input.video
             ]
             return task_output, video_embeddings_float
 
@@ -113,16 +113,16 @@ class MultimodalEmbeddingModel:
                 embedding.embeddings_float
                 for embedding in task_output.video_embeddings
                 if embedding.embedding_scope == "video"
-                # and embedding.video == input.video
+                and embedding.video == input.video
             ]
             return task_output, video_embeddings_float
 
         task_output, video_embeddings_float = _query()
 
         # TODO: used for user's uploaded videos (in future)
-        # if not video_embeddings_float:
-        #     logging.warning("Query not found => Generating the embedding")
-        #     task_output, video_embeddings_float = _generate()
+        if not video_embeddings_float:
+            logging.warning("Query not found => Generating the embedding")
+            task_output, video_embeddings_float = _generate()
 
         if not video_embeddings_float:
             raise ValueError("Error when generating video embedding")

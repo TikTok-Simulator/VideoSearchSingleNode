@@ -13,6 +13,23 @@ logging.info("Retrieving data from Milvus database: %s", DB_URL)
 model = MultimodalEmbeddingModel()
 milvus = MilvusDatabase(DB_URL)
 
+sample_videos = [
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",# too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",# too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",# too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4", # too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", # too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",  # too long :v
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",  # 15s
+    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  # 15s
+    "video-fetch-and-trim/videos/education_0.mp4",  # local
+    "video-fetch-and-trim/videos/education_2.mp4",  # local
+    "video-fetch-and-trim/videos/news & politics_0.mp4",  # local
+    "video-fetch-and-trim/videos/news & politics_1.mp4",  # local
+]
+
 
 def main(video_url: str):
     # Define embedding model
@@ -29,3 +46,16 @@ def main(video_url: str):
     )
 
     return results
+
+
+def init(n_videos: int):
+    """Return list of trending videos"""
+    results = milvus.query(
+        collection_name=VIDEO_COLLECTION_NAME, limit=20, output_fields=["video"]
+    )
+    video_list = [res["video"] for res in results]
+
+    # TODO fix it: why it duplicate here
+    video_list = list(dict.fromkeys(video_list))  # remove duplicate
+    return video_list[:n_videos]
+    # return sample_videos[:n_videos]
