@@ -1,4 +1,5 @@
 import os
+import random
 import json
 from typing import Generator, Tuple
 from src.schemas.input import TaskInput
@@ -46,9 +47,13 @@ def get_videos_and_descriptions() -> Generator[Tuple[VideoMetadata, str], None, 
         os.path.join(videos_folder_path, file)
         for file in os.listdir(videos_folder_path)
         if file.endswith(".mp4")
-        and file.startswith("news & politics")  # hardcoded for testing -> remove later
+        # and file.startswith("news & politics") # [DEBUG] hardcoded for testing -> remove later
     ]
-    for video_file in tqdm(video_files[6:]):  # hardcoded for testing -> remove later
+
+    # [Note] hardcoded for testing -> remove later
+    video_files = random.choices(video_files, k=10)
+
+    for video_file in tqdm(video_files):
         metadata_file_name = os.path.basename(video_file)
         metadata_file = os.path.join(
             metadata_folder_path, f"{os.path.splitext(metadata_file_name)[0]}.json"

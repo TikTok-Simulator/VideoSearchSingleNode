@@ -1,6 +1,6 @@
-import random
+import logging
 import gradio as gr
-from gradio_main import main
+from gradio_main import main, init
 
 # Paths can be a list of strings or pathlib.Path objects
 # corresponding to filenames or directories.
@@ -8,24 +8,13 @@ from gradio_main import main
 # !Important, if you do not define like that, a file will be located in a temp and uncontrolled path
 gr.set_static_paths(paths=["video-fetch-and-trim/videos/"])
 
-video_list = [
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",# too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",# too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",# too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4", # too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", # too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",  # too long :v
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",  # 15s
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",  # 15s
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",  # 15s
-    # "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  # 15s
-    "video-fetch-and-trim/videos/education_0.mp4",  # local
-    "video-fetch-and-trim/videos/education_1.mp4",  # local
-    "video-fetch-and-trim/videos/education_2.mp4",  # local
-    "video-fetch-and-trim/videos/education_3.mp4",  # local
-]
 
 N_VIDEOS = 4
+video_list = init(n_videos=N_VIDEOS)
+
+
+logging.info("Trending videos: %s", video_list)
+print("Trending videos: %s", video_list)
 
 # This JS will be injected once and run when the app loads
 custom_js = """
@@ -77,12 +66,14 @@ def retrieve_related_videos(video_url: str):
 
     retrieved_videos = main(video_url=video_url)
     video_list = retrieved_videos.videos
-    n_videos = min(len(video_list), N_VIDEOS)
 
-    indices = random.sample(range(n_videos), n_videos)
+    video_list = list(dict.fromkeys(video_list))  # remove duplicate
+
     return [
-        gr.update(elem_id=f"recommended-video-{i}", value=video_list[vi])
-        for i, vi in enumerate(indices)
+        gr.update(elem_id=f"recommended-video-{i}")
+        if i >= len(video_list)
+        else gr.update(elem_id=f"recommended-video-{i}", value=video_list[i])
+        for i in range(N_VIDEOS)
     ]
 
 

@@ -82,4 +82,23 @@ HUGGING_FACE_TOKEN=<HUGGING_FACE_TOKEN>
 CATEGORY=Education # check out https://github.com/TikTok-Simulator/video-fetch-and-trim?tab=readme-ov-file#list-of-categories
 MAX_VIDEOS_PER_CATEGORY=10
 TWELVE_LABS_API_KEY=<TWELVE_LABS_API_KEY>
+DB_URL=http://localhost:19530
+VIDEO_COLLECTION_NAME=video_embedding
+TEXT_COLLECTION_NAME=text_embedding
+GRADIO_TEMP_DIR=video-fetch-and-trim/videos # !important store the downloaded video from internet url
+```
+
+## Gradio demo
+- `gradio_demo.py`: run `python gradio_demo.py` to start a demo UI 
+- `gradio_main.py`: contains exported function used to `gradio_demo.py`
+- `gradio_download.py`: test streaming video: download a video from the internet and concat to a local video until end
+- `gradio_stream.py`: test streaming video: streaming video by continious loading and displaying the local video
+
+
+## How to reset database
+```bash
+#!/bin/bash
+docker-compose down
+rm -rf ./volumes/etcd ./volumes/minio ./volumes/milvus
+docker-compose up -d
 ```

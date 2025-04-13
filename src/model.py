@@ -1,10 +1,14 @@
 import logging
+import os
+from urllib import request
 
-from .models.video_embedding import VideoEmbeddingModel
-from .models.text_embedding import TextEmbeddingModel
-from .schemas.input import TaskInput
-from .schemas.output import TaskOutput, RetrievalOutput
 from .milvus import MilvusDatabase
+from .models.text_embedding import TextEmbeddingModel
+from .models.video_embedding import VideoEmbeddingModel
+from .schemas.input import TaskInput
+from .schemas.output import RetrievalOutput, TaskOutput
+
+MILVUS_FILE_DIR = os.environ.get("MILVUS_FILE_DIR", "video-fetch-and-trim/videos")
 
 
 class MultimodalEmbeddingModel:
@@ -17,6 +21,13 @@ class MultimodalEmbeddingModel:
             video = input.video
 
             if input.video_type == "url":
+                # download video from url and save to MILVUS_FILE_DIR
+                video_file_path = os.path.join(MILVUS_FILE_DIR, os.path.basename(video))
+                request.urlretrieve(video, video_file_path)
+                video = video_file_path
+                logging.info(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+                print(f"Downloaded video from url to {MILVUS_FILE_DIR}")
+
                 video_embeddings, _ = self.video_embedding_model.generate_embedding_url(
                     video
                 )
@@ -102,7 +113,7 @@ class MultimodalEmbeddingModel:
                 embedding.embeddings_float
                 for embedding in task_output.video_embeddings
                 if embedding.embedding_scope == "video"
-                # and embedding.video == input.video
+                and embedding.video == input.video
             ]
             return task_output, video_embeddings_float
 
@@ -113,12 +124,13 @@ class MultimodalEmbeddingModel:
                 embedding.embeddings_float
                 for embedding in task_output.video_embeddings
                 if embedding.embedding_scope == "video"
-                # and embedding.video == input.video
+                and embedding.video == input.video
             ]
             return task_output, video_embeddings_float
 
         task_output, video_embeddings_float = _query()
 
+        # TODO: used for user's uploaded videos (in future)
         if not video_embeddings_float:
             logging.warning("Query not found => Generating the embedding")
             task_output, video_embeddings_float = _generate()
@@ -149,4 +161,6 @@ class MultimodalEmbeddingModel:
             text_list = [text_result["entity"]["text"] for text_result in text_results]
             results["text_list"] = text_list
 
+        logging.info(f"Retrieved list of videos: {results['videos']}")
+        print(f"Retrieved list of videos: {results['videos']}")
         return RetrievalOutput(**results)
