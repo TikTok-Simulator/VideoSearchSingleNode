@@ -32,23 +32,25 @@ def main(video_url: str):
     results = []
 
     def query_from_instance(milvus_instance):
-        return model.retrieve_similarity_from_milvus(
+        res = model.retrieve_similarity_from_milvus(
             input_,
             milvus_instance,
             VIDEO_COLLECTION_NAME,
             TEXT_COLLECTION_NAME,
             limit=10,
         )
+        return milvus_instance, res
 
     with ThreadPoolExecutor(max_workers=len(milvus_instances)) as executor:
         futures = [executor.submit(query_from_instance, m) for m in milvus_instances]
         for future in as_completed(futures):
             try:
-                res = future.result()
+                milvus_ins, res = future.result()
+                res.milvus_uri = milvus_ins.uri
                 results.extend(res)
             except Exception as e:
                 logger.error(f"Query failed from instance: {e}")
-
+    logger.info(f"Retrieved {len(results)} videos for {video_url}: \n```{results}```")
     return results
 
 

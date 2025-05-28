@@ -23,3 +23,4 @@ class TaskOutput(BaseModel):
 class RetrievalOutput(BaseModel):
     videos: List[str] = Field(default_factory=list)
     text_list: List[str] = Field(default=[])
+    milvus_uri: Optional[str] = None
