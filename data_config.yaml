@@ -1,0 +1,3 @@
+base_dir: "video-fetch-and-trim/sample_db"
+metadata_path: "metadata"
+videos_path: "videos"
