@@ -57,5 +57,8 @@ def init(n_videos: int):
 
     # TODO fix it: why it duplicate here
     video_list = list(dict.fromkeys(video_list))  # remove duplicate
-    return video_list[:n_videos]
+    video_list = video_list[:n_videos] + [None] * abs(
+        n_videos - len(video_list)
+    )  # pad with None if not enough videos
+    return video_list
     # return sample_videos[:n_videos]
