@@ -19,7 +19,30 @@ This project enables video retrieval by generating embeddings from videos and de
    ```
 2. **Supported Platforms**: This project runs on Linux and macOS only due to Milvus Lite's operating system restrictions.
 
-## Repository Setup
+## Quick Setup with `setup.sh`
+
+To simplify the setup process, you can use the provided `setup.sh` script. This script automates the following steps:
+- Cloning required repositories.
+- Starting Docker services.
+- Setting up the Python virtual environment.
+- Installing dependencies.
+- Creating the `.env` file.
+
+### Usage
+
+1. Make the script executable:
+   ```bash
+   chmod +x setup.sh
+   ```
+2. Run the script:
+   ```bash
+   ./setup.sh
+   ```
+3. Follow the instructions printed by the script. If the `.env` file is created, update it with your API keys and other required values.
+
+## Manual Setup
+
+If you prefer to set up the project manually, follow the steps below.
 
 ### Step 1: Clone Required Repositories
 
