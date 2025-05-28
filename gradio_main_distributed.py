@@ -33,7 +33,11 @@ def main(video_url: str):
 
     def query_from_instance(milvus_instance):
         return model.retrieve_similarity_from_milvus(
-            input_, milvus_instance, VIDEO_COLLECTION_NAME, TEXT_COLLECTION_NAME, limit=10
+            input_,
+            milvus_instance,
+            VIDEO_COLLECTION_NAME,
+            TEXT_COLLECTION_NAME,
+            limit=10,
         )
 
     with ThreadPoolExecutor(max_workers=len(milvus_instances)) as executor:
@@ -54,9 +58,7 @@ def init(n_videos: int):
 
     def fetch_from_instance(milvus_instance, url):
         return url, milvus_instance.query(
-            collection_name=VIDEO_COLLECTION_NAME,
-            limit=20,
-            output_fields=["video"]
+            collection_name=VIDEO_COLLECTION_NAME, limit=20, output_fields=["video"]
         )
 
     with ThreadPoolExecutor(max_workers=len(milvus_instances)) as executor:
@@ -74,4 +76,7 @@ def init(n_videos: int):
 
     # Remove duplicates
     video_list = list(dict.fromkeys([r["video"] for r in results]))
-    return video_list[:n_videos]
+    video_list = video_list[:n_videos] + [None] * abs(
+        n_videos - len(video_list)
+    )  # Pad with None if not enough videos
+    return video_list

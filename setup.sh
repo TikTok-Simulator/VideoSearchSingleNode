@@ -58,6 +58,7 @@ HUGGING_FACE_TOKEN=<your-hugging-face-token>
 CATEGORY=Education
 MAX_VIDEOS_PER_CATEGORY=10
 DB_URL=http://localhost:19530
+DB_URLs=http://localhost:19530 # Can add more DB URL, seperate by ","
 VIDEO_COLLECTION_NAME=video_embedding
 TEXT_COLLECTION_NAME=text_embedding
 GRADIO_TEMP_DIR=video-fetch-and-trim/videos
