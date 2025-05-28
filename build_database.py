@@ -120,7 +120,7 @@ def main_build_database(milvus: MilvusDatabase):
 
     # Define input data (video + description pairs).
     loader_ = get_videos_and_descriptions()
-    loader_url_ = get_videos_and_descriptions_from_urls()
+    loader_url_ = []  # get_videos_and_descriptions_from_urls()
 
     for metadata, video_path in chain(loader_, loader_url_):
         # Define input data (video + description pairs).

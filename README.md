@@ -102,3 +102,8 @@ docker-compose down
 rm -rf ./volumes/etcd ./volumes/minio ./volumes/milvus
 docker-compose up -d
 ```
+
+IP config
+```bash
+ipconfig getifaddr en0
+```
