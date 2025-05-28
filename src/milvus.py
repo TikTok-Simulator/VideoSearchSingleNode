@@ -8,6 +8,7 @@ from .schemas.output import TaskOutput
 
 class MilvusDatabase:
     def __init__(self, db_name: str):
+        self.uri = db_name
         self.milvus_client = self._create_database(db_name)
 
     def _create_database(
