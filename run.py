@@ -17,8 +17,8 @@ def basic_run(milvus: MilvusDatabase):
 
     # Define sample query data (video + description)
     # sample_video_url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
-    sample_video_file = "video-fetch-and-trim/videos/education_2.mp4"  # Can use wget to download the URL as local file
-    sample_description = "A passionate and assertive sermon by Prophet Kofi Oduro, challenging societal norms and calling for boldness in faith."
+    sample_video_file = "video-fetch-and-trim/videos/lifestyle_0.mp4"  # Can use wget to download the URL as local file
+    sample_description = "The video tutorial demonstrates the preparation of Vendakka MoruCurry showcasing ingredients and cooking steps."
     input_ = TaskInput(
         video=sample_video_file,
         text=sample_description,
@@ -26,7 +26,7 @@ def basic_run(milvus: MilvusDatabase):
 
     # Retrieve a video
     results = model.retrieve_similarity_from_milvus(
-        input_, milvus, VIDEO_COLLECTION_NAME, TEXT_COLLECTION_NAME, limit=10
+        input_, milvus, VIDEO_COLLECTION_NAME, TEXT_COLLECTION_NAME, limit=3
     )
 
     print("Retrieval results:\n", results)
