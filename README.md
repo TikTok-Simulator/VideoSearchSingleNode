@@ -124,11 +124,26 @@ GRADIO_TEMP_DIR=video-fetch-and-trim/videos
 
 ### Step 1: Build the Vector Database
 
-Run the `build_database.py` script to populate the Milvus database with video and text embeddings. Use the `--config` flag to specify the path to the YAML configuration file:
+Run the `build_database.py` script to populate the Milvus database with video and text embeddings. Use the `--config` flag to specify the path to the YAML configuration file. The configuration file defines the base directory, metadata path, and videos path.
 
+#### Example Configuration File (`data_config.yaml`):
+```yaml
+base_dir: "video-fetch-and-trim"
+metadata_path: "metadata"
+videos_path: "videos"
+```
+
+#### Command to Build the Database:
 ```bash
 python3 build_database.py --config data_config.yaml
 ```
+
+If you want to rebuild the database (recreate collections), use the `--rebuild` flag:
+```bash
+python3 build_database.py --config data_config.yaml --rebuild
+```
+
+The `--config` flag ensures the script dynamically loads the paths for metadata and videos based on the YAML file, making it flexible for different directory structures.
 
 ### Step 2: Perform Video Retrieval
 
@@ -143,7 +158,7 @@ python3 run.py
 Run the Gradio demo for an interactive UI:
 
 ```bash
-python3 gradio_demo.py
+python3 gradio_demo.py --config data_config.yaml
 ```
 
 ## Resetting the Database

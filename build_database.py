@@ -4,9 +4,9 @@ import random
 from itertools import chain
 from typing import Generator, Tuple
 
+import yaml  # Add YAML import
 from loguru import logger
 from tqdm import tqdm
-import yaml  # Add YAML import
 
 from src.milvus import MilvusDatabase, insert_task_output_to_milvus
 from src.model import MultimodalEmbeddingModel
@@ -60,7 +60,7 @@ def get_videos_and_descriptions(
         )
 
 
-def main_build_database(milvus: MilvusDatabase):
+def main_build_database(milvus: MilvusDatabase, config: dict):
     # Define embedding model
     model = MultimodalEmbeddingModel()
 
@@ -98,20 +98,30 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Build video embedding database.")
     parser.add_argument(
-        "--config", type=str, required=True, help="Path to the YAML configuration file."
+        "--config",
+        type=str,
+        required=True,
+        help="Path to the YAML configuration file.",
+        default="data_config.yaml",
+    )
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Rebuild the database by recreating collections.",
     )
     args = parser.parse_args()
 
     config = load_config(args.config)
 
     milvus = MilvusDatabase(DB_URL)
-    FORCE = False
-    if FORCE or not milvus.milvus_client.has_collection(
+    if args.rebuild or not milvus.milvus_client.has_collection(
         collection_name=VIDEO_COLLECTION_NAME
     ):
         milvus.create_collection(VIDEO_COLLECTION_NAME)
-    if FORCE or not milvus.milvus_client.has_collection(
+    if args.rebuild or not milvus.milvus_client.has_collection(
         collection_name=TEXT_COLLECTION_NAME
     ):
         milvus.create_collection(TEXT_COLLECTION_NAME)
-    main_build_database(milvus)
+
+    logger.info(f"Building database with config: {config}")
+    main_build_database(milvus, config)

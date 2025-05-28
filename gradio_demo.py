@@ -1,6 +1,10 @@
-from loguru import logger
+# import os
+
 import gradio as gr
-from gradio_main import main, init
+from loguru import logger
+
+# from build_database import load_config
+from gradio_main import init, main
 
 # Paths can be a list of strings or pathlib.Path objects
 # corresponding to filenames or directories.
@@ -70,7 +74,7 @@ def retrieve_related_videos(video_url: str):
     video_list = list(dict.fromkeys(video_list))  # remove duplicate
 
     return [
-        gr.update(elem_id=f"recommended-video-{i}")
+        gr.update(elem_id=f"recommended-video-{i}", value=None)
         if i >= len(video_list)
         else gr.update(elem_id=f"recommended-video-{i}", value=video_list[i])
         for i in range(N_VIDEOS)
@@ -131,4 +135,18 @@ with gr.Blocks(js=custom_js) as demo:
         outputs=recommended_videos_display,
     )
 
-demo.launch()
+if __name__ == "__main__":
+    # import argparse
+
+    # parser = argparse.ArgumentParser(description="Build video embedding database.")
+    # parser.add_argument(
+    #     "--config", type=str, required=True, help="Path to the YAML configuration file."
+    # )
+    # args = parser.parse_args()
+
+    # config = load_config(args.config)
+
+    # videos_folder_path = os.path.join(config["base_dir"], config["videos_path"])
+    # os.environ["GRADIO_TEMP_DIR"] = videos_folder_path
+    # logger.info(f"Gradio temp dir: {videos_folder_path}")
+    demo.launch()

@@ -145,6 +145,7 @@ class MultimodalEmbeddingModel:
             video_embeddings_float,
             limit,
             ["video", "embedding_scope"],
+            filter=f"video!='{input.video}'",
         )
         videos = [
             video_result["entity"]["video"]
@@ -156,7 +157,11 @@ class MultimodalEmbeddingModel:
         if task_output.text_embedding:
             text_embedding_float = task_output.text_embedding.embeddings_float
             text_results = milvus.retrieve_similarity(
-                text_collection_name, [text_embedding_float], limit, ["text"]
+                text_collection_name,
+                [text_embedding_float],
+                limit,
+                ["text"],
+                filter=f"video!='{input.video}'",
             )
             text_list = [text_result["entity"]["text"] for text_result in text_results]
             results["text_list"] = text_list
