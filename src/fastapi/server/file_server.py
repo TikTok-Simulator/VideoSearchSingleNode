@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # Configure the directory to serve files from
 # TODO: CHANGE THIS
-BASE_DIR = Path(__file__).parent.parent.parent.parent / "video-fetch-and-trim"
+BASE_DIR = Path(__file__).parent.parent.parent.parent / "video-fetch-and-trim/videos"
 PORT = 5678
 
 
