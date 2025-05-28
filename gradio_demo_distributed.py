@@ -15,7 +15,6 @@ video_list = init(n_videos=N_VIDEOS)
 
 
 logger.info(f"Trending videos: {video_list}")
-# print(f"Trending videos: {video_list}")
 
 # This JS will be injected once and run when the app loads
 custom_js = """
@@ -67,22 +66,19 @@ def retrieve_related_videos(video_url: str):
 
     retrieved_videos = main(video_url=video_url)
     retrieved_videos = RetrievalOutput(**dict(retrieved_videos))
-    video_list = retrieved_videos.videos if retrieved_videos and retrieved_videos.videos else []
+    video_list = (
+        retrieved_videos.videos if retrieved_videos and retrieved_videos.videos else []
+    )
 
     video_list = list(dict.fromkeys(video_list))  # remove duplicate
     logger.info(f"video_list: {video_list}")
 
     return [
-        gr.update(elem_id=f"recommended-video-{i}")
+        gr.update(elem_id=f"recommended-video-{i}", value=None)
         if i >= len(video_list)
         else gr.update(elem_id=f"recommended-video-{i}", value=video_list[i])
         for i in range(N_VIDEOS)
     ]
-
-
-# def stream_video(video_path):
-#     # Stream logic here
-#     yield video_path
 
 
 with gr.Blocks(js=custom_js) as demo:
@@ -96,7 +92,6 @@ with gr.Blocks(js=custom_js) as demo:
             loop=True,
             interactive=False,
             elem_id="video-display",
-            # streaming=True,  # TODO
         )
 
     # Button to load the next video from the list.
@@ -117,7 +112,6 @@ with gr.Blocks(js=custom_js) as demo:
                         loop=True,
                         interactive=False,
                         show_label=False,
-                        # streaming=True,  # TODO
                     )
                 ]
                 gr.Button(f"▶ Video {i + 1}", elem_id=f"select-btn-{i}").click(
@@ -134,4 +128,5 @@ with gr.Blocks(js=custom_js) as demo:
         outputs=recommended_videos_display,
     )
 
-demo.launch()
+if __name__ == "__main__":
+    demo.launch()
