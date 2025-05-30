@@ -15,8 +15,9 @@ def list_files(path=""):
         return None
 
 
-def download_file(file_path, local_path):
-    response = requests.get(f"{SERVER_URL}/files/{file_path}", stream=True)
+def download_file(server_ip, file_path, local_path):
+    server_url = f"http://{server_ip}:{PORT}"
+    response = requests.get(f"{server_url}/files/{file_path}", stream=True)
     if response.status_code == 200:
         with open(local_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
@@ -35,7 +36,7 @@ def stream_file(server_ip, file_path, chunk_size=8192):
     else:
         print(f"Error: {response.status_code} - {response.json()['description']}")
         return None
-    
+
 
 # Example usage
 if __name__ == "__main__":
@@ -49,9 +50,5 @@ if __name__ == "__main__":
     # # Download a specific file
     # download_file("videos/lifestyle_0.mp4", "local_lifestyle_0.mp4")
 
-    iterator = stream_file(
-        server_ip="localhost", 
-        file_path="lifestyle_0.mp4"
-    )
+    iterator = stream_file(server_ip="localhost", file_path="lifestyle_0.mp4")
     print(iterator)
-    

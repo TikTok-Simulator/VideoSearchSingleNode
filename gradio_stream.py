@@ -2,6 +2,10 @@ import gradio as gr
 import cv2
 import uuid
 
+# ------------------------------------------------------------------------------------------
+# This streaming method does not include audio!!!
+# ------------------------------------------------------------------------------------------
+
 SUBSAMPLE = 2
 
 
@@ -9,11 +13,11 @@ def process_video(video_path):
     cap = cv2.VideoCapture(
         filename="https://sample-videos.com/video321/mp4/240/big_buck_bunny_240p_30mb.mp4"
     )
-    fps = int(cap.get(cv2.CAP_PROP_FPS)) // SUBSAMPLE  # Giảm tốc độ khung hình
+    fps = int(cap.get(cv2.CAP_PROP_FPS)) // SUBSAMPLE  # Frames per second of the video
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     video_codec = cv2.VideoWriter.fourcc(*"mp4v")  # Codec for MP4 format
-    output_video_name = f"output_{uuid.uuid4()}.mp4"
+    output_video_name = f"cache_video_{uuid.uuid4()}.mp4"
     output_video = cv2.VideoWriter(output_video_name, video_codec, fps, (width, height))
 
     n_frames = 0
@@ -22,7 +26,7 @@ def process_video(video_path):
     while ret:
         if n_frames % SUBSAMPLE == 0:
             batch.append(frame)
-        if len(batch) == SUBSAMPLE * fps:
+        if len(batch) == 2 * fps:
             for frame in batch:
                 output_video.write(frame)
             batch = []
@@ -41,14 +45,14 @@ def process_video(video_path):
 
 with gr.Blocks() as demo:
     video_component = gr.Video(
-        label="Downloaded Video",
+        label="Streaming Video",
         autoplay=True,
         loop=False,
         interactive=False,
         streaming=True,
     )
 
-    gr.Button("Download and Show Video").click(
+    gr.Button("Stream Video").click(
         fn=process_video,
         outputs=video_component,
     )

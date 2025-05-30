@@ -1,9 +1,14 @@
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Dict, List
+
 from loguru import logger
-from src.schemas.input import TaskInput
-from src.model import MultimodalEmbeddingModel
+from pydantic import BaseModel
+
+# from src.fastapi.client_example import download_file
 from src.milvus import MilvusDatabase
+from src.model import MultimodalEmbeddingModel
+from src.schemas.input import TaskInput
 
 # Load multiple DB URLs from environment
 DB_URLs = os.environ.get("DB_URLs", "http://localhost:19530").split(",")
@@ -24,7 +29,13 @@ sample_videos = [
 ]
 
 
-def main(video_url: str):
+class VideoAttributes(BaseModel):
+    video_path: str
+    video_embedding: List[float]
+    uri: str
+
+
+def main(video_url: str) -> List[VideoAttributes]:
     input_ = TaskInput(
         video=video_url,
         text=None,
@@ -37,7 +48,7 @@ def main(video_url: str):
             milvus_instance,
             VIDEO_COLLECTION_NAME,
             TEXT_COLLECTION_NAME,
-            limit=10,
+            limit=50,
         )
         return milvus_instance, res
 
@@ -47,20 +58,45 @@ def main(video_url: str):
             try:
                 milvus_ins, res = future.result()
                 res.milvus_uri = milvus_ins.uri
-                results.extend(res)
+                for i in range(len(res.videos)):
+                    # TODO, request to download here
+                    video_attributes = VideoAttributes(
+                        video_path=res.videos[i],
+                        video_embedding=res.video_embeddings[i],
+                        uri=res.milvus_uri,
+                    )
+                    results.append({video_attributes.video_path: video_attributes})
             except Exception as e:
                 logger.error(f"Query failed from instance: {e}")
-    logger.info(f"Retrieved {len(results)} videos for {video_url}: \n```{results}```")
-    return results
+
+    logger.info(
+        f"Retrieved {len(results)} videos for {video_url}: {[list(res.keys())[0] for res in results]}"
+    )
+
+    unique_dict: Dict[str, VideoAttributes] = {}
+    for item in results:
+        for key, value in item.items():
+            # if key == video_url:
+            #     continue
+            if key not in unique_dict:
+                unique_dict[key] = value
+
+    logger.info(
+        f"Retrieved {len(unique_dict)} unique videos from Milvus instances: {DB_URLs}"
+    )
+    video_list = list(unique_dict.values())
+    return video_list
 
 
-def init(n_videos: int):
+def init(n_videos: int) -> List[VideoAttributes | None]:
     """Return list of trending videos"""
-    results = []
+    results: List[Dict[str, VideoAttributes]] = []
 
-    def fetch_from_instance(milvus_instance, url):
+    def fetch_from_instance(milvus_instance: MilvusDatabase, url):
         return url, milvus_instance.query(
-            collection_name=VIDEO_COLLECTION_NAME, limit=20, output_fields=["video"]
+            collection_name=VIDEO_COLLECTION_NAME,
+            limit=50,
+            output_fields=["video", "embeddings_float"],
         )
 
     with ThreadPoolExecutor(max_workers=len(milvus_instances)) as executor:
@@ -72,13 +108,32 @@ def init(n_videos: int):
             try:
                 url, res = future.result()
                 logger.info(f"Fetched {len(res)} videos from {url}")
-                results.extend(res)
+                for video in res:
+                    # TODO, request to download here
+                    video_attributes = VideoAttributes(
+                        video_path=video["video"],
+                        video_embedding=video["embeddings_float"],
+                        uri=url,
+                    )
+                    results.append({video_attributes.video_path: video_attributes})
             except Exception as e:
                 logger.error(f"Init query failed from instance: {e}")
 
-    # Remove duplicates
-    video_list = list(dict.fromkeys([r["video"] for r in results]))
+    unique_dict: Dict[str, VideoAttributes] = {}
+    for item in results:
+        for key, value in item.items():
+            if key not in unique_dict:
+                unique_dict[key] = value
+
+    logger.info(
+        f"Retrieved {len(unique_dict)} unique videos from Milvus instances: {DB_URLs}"
+    )
+    video_list = list(unique_dict.values())
+    # Pad with None if not enough videos
+    logger.info(
+        f"There are/is {len([None] * abs(max(n_videos - len(video_list), 0)))} lack of videos, padding with None"
+    )
     video_list = video_list[:n_videos] + [None] * abs(
-        n_videos - len(video_list)
-    )  # Pad with None if not enough videos
+        max(n_videos - len(video_list), 0)
+    )
     return video_list

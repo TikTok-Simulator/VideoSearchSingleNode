@@ -138,21 +138,26 @@ class MultimodalEmbeddingModel:
         if not video_embeddings_float:
             raise ValueError("Error when generating video embedding")
 
-        results = {}
-
         video_results = milvus.retrieve_similarity(
             video_collection_name,
             video_embeddings_float,
             limit,
-            ["video", "embedding_scope"],
-            filter=f"video!='{input.video}'",
+            ["video", "embedding_scope", "embeddings_float"],
+            filter=f'video!="{input.video}"',
         )
-        videos = [
-            video_result["entity"]["video"]
-            for video_result in video_results
-            if video_result["entity"]["embedding_scope"] == "video"
-        ]
-        results["videos"] = videos
+
+        results = {
+            "videos": [],
+            "text_list": [],
+            "video_embeddings": [],
+            "milvus_uri": milvus.uri if milvus else None,
+        }
+        for video_result in video_results:
+            if video_result["entity"]["embedding_scope"] == "video":
+                results["videos"].append(video_result["entity"]["video"])
+                results["video_embeddings"].append(
+                    video_result["entity"]["embeddings_float"]
+                )
 
         if task_output.text_embedding:
             text_embedding_float = task_output.text_embedding.embeddings_float
