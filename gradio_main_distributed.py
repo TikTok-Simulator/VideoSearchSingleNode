@@ -50,7 +50,7 @@ def main(video_url: str, video_embedding: List[float]) -> List[VideoAttributes]:
             milvus_instance,
             VIDEO_COLLECTION_NAME,
             TEXT_COLLECTION_NAME,
-            limit=50,
+            limit=30,
         )
         return milvus_instance, res
 
@@ -61,15 +61,14 @@ def main(video_url: str, video_embedding: List[float]) -> List[VideoAttributes]:
                 milvus_ins, res = future.result()
                 res.milvus_uri = milvus_ins.uri
                 for i in range(len(res.videos)):
-                    # if res.milvus_uri == os.environ.get("DB_URL"):
-                    #     continue
-                    # TODO, request to download here
-                    download_file(
-                        res.milvus_uri,
-                        os.path.basename(res.videos[i]),
-                        # "download/" + res.videos[i], # for individual testing
-                        res.videos[i],  # for distributed testing
-                    )
+                    if res.milvus_uri != os.environ.get("DB_URL"):
+                        # TODO, request to download here
+                        download_file(
+                            res.milvus_uri,
+                            os.path.basename(res.videos[i]),
+                            # "download/" + res.videos[i], # for individual testing
+                            res.videos[i],  # for distributed testing
+                        )
                     video_attributes = VideoAttributes(
                         video_path=res.videos[i],
                         video_embedding=res.video_embeddings[i],
@@ -105,7 +104,7 @@ def init(n_videos: int) -> List[VideoAttributes | None]:
     def fetch_from_instance(milvus_instance: MilvusDatabase, url):
         return url, milvus_instance.query(
             collection_name=VIDEO_COLLECTION_NAME,
-            limit=50,
+            limit=30,
             output_fields=["video", "embeddings_float"],
         )
 
@@ -120,14 +119,13 @@ def init(n_videos: int) -> List[VideoAttributes | None]:
                 logger.info(f"Fetched {len(res)} videos from {url}")
                 for video in res:
                     # TODO, request to download here
-                    # if url == os.environ.get("DB_URL"):
-                    #     continue
-                    download_file(
-                        url,
-                        os.path.basename(video["video"]),
-                        # "download/" + video["video"], # for individual testing
-                        video["video"],  # for distributed testing
-                    )
+                    if url != os.environ.get("DB_URL"):
+                        download_file(
+                            url,
+                            os.path.basename(video["video"]),
+                            # "download/" + video["video"], # for individual testing
+                            video["video"],  # for distributed testing
+                        )
                     video_attributes = VideoAttributes(
                         video_path=video["video"],
                         video_embedding=video["embeddings_float"],
