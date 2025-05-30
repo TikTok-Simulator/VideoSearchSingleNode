@@ -2,6 +2,7 @@ from flask import Flask, send_file, jsonify, abort
 import os
 import socket
 from pathlib import Path
+from loguru import logger
 
 app = Flask(__name__)
 
@@ -9,6 +10,8 @@ app = Flask(__name__)
 # TODO: CHANGE THIS
 BASE_DIR = Path(__file__).parent.parent.parent.parent / "video-fetch-and-trim/videos"
 PORT = 5678
+
+logger.info(f"Serving files from {BASE_DIR}")
 
 
 def is_valid_path(path):
@@ -29,6 +32,7 @@ def get_file(file_path):
     if os.path.isfile(file_full_path):
         return send_file(file_full_path)
     else:
+        logger.warning(f"File not found: {file_full_path}")
         abort(404, description="Not a file")
 
 
@@ -47,14 +51,12 @@ def list_files(dir_path):
     files = []
     for item in os.listdir(dir_full_path):
         item_path = os.path.join(dir_full_path, item)
-        files.append(
-            {
-                "name": item,
-                "type": "directory" if os.path.isdir(item_path) else "file",
-                "size": os.path.getsize(item_path),
-                "last_modified": os.path.getmtime(item_path),
-            }
-        )
+        files.append({
+            "name": item,
+            "type": "directory" if os.path.isdir(item_path) else "file",
+            "size": os.path.getsize(item_path),
+            "last_modified": os.path.getmtime(item_path),
+        })
 
     return jsonify(files)
 

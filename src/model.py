@@ -132,15 +132,15 @@ class MultimodalEmbeddingModel:
 
         # TODO: used for user's uploaded videos (in future)
         if not video_embeddings_float:
-            logger.warning("Query not found => Generating the embedding")
-            task_output, video_embeddings_float = _generate()
+            # TODO hardcoded to generate embedding for user's uploaded video
+            video_embeddings_float = [input.video_embedding]
 
         if not video_embeddings_float:
             raise ValueError("Error when generating video embedding")
 
         video_results = milvus.retrieve_similarity(
             video_collection_name,
-            video_embeddings_float,
+            video_embeddings_float,  # type:ignore
             limit,
             ["video", "embedding_scope", "embeddings_float"],
             filter=f'video!="{input.video}"',

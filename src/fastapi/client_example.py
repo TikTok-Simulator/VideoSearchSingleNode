@@ -1,4 +1,6 @@
+import os
 import requests
+from loguru import logger
 
 # TODO: Replace with destination server's IP
 SERVER_IP = "10.130.92.78"
@@ -15,10 +17,20 @@ def list_files(path=""):
         return None
 
 
-def download_file(server_ip, file_path, local_path):
-    server_url = f"http://{server_ip}:{PORT}"
-    response = requests.get(f"{server_url}/files/{file_path}", stream=True)
+def download_file(uri: str, filename: str, local_path):
+    """
+    uri = http://ip:port, same to each of db_url from DB_URLs
+    """
+    # Replace from the default port 19530 of Milvus to the file server port 5678
+    uri = uri.replace(
+        ":19530", ":5678"
+    )  # Ensure the port is correct for the file server
+    logger.info(f"Downloading file from {uri}/files/{filename} to {local_path}")
+    response = requests.get(f"{uri}/files/{filename}", stream=True)
+    logger.info(f"Response status code: {response.status_code}")
     if response.status_code == 200:
+        folder = os.path.dirname(local_path)
+        os.makedirs(folder, exist_ok=True)
         with open(local_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:

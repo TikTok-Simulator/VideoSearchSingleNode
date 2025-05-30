@@ -89,7 +89,16 @@ def retrieve_related_videos(
 ):  # -> embedding_dict, recommended_videos_display: List[gr.Video]:
     global current_index, recommended_video_list
 
-    retrieved_videos = main(video_url=local_video_path)
+    """Retrieve related videos based on the current video and update the embedding dictionary."""
+    if local_video_path is None or local_video_path == "":
+        gr.Error("No video path provided.")
+    if local_video_path not in embedding_dict:
+        gr.Error(f"Video path {local_video_path} not found in embedding dictionary.")
+
+    retrieved_videos = main(
+        video_url=local_video_path,
+        video_embedding=embedding_dict[local_video_path].video_embedding,
+    )
     for retrieved_video in retrieved_videos:
         if retrieved_video.video_path not in embedding_dict:
             embedding_dict[retrieved_video.video_path] = retrieved_video

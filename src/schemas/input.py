@@ -6,6 +6,7 @@ from ..utils.validate_video import is_valid_video_url, is_valid_video_file
 
 class TaskInput(BaseModel):
     video: str
+    video_embedding: Optional[list[float]] = None  # Optional, can be set later
     video_type: str = Field(default="file")  # automatically set based on validator
     text: str | None = None
 

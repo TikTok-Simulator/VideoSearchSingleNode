@@ -6,6 +6,7 @@ from loguru import logger
 from pydantic import BaseModel
 
 # from src.fastapi.client_example import download_file
+from src.fastapi.client_example import download_file
 from src.milvus import MilvusDatabase
 from src.model import MultimodalEmbeddingModel
 from src.schemas.input import TaskInput
@@ -35,9 +36,10 @@ class VideoAttributes(BaseModel):
     uri: str
 
 
-def main(video_url: str) -> List[VideoAttributes]:
+def main(video_url: str, video_embedding: List[float]) -> List[VideoAttributes]:
     input_ = TaskInput(
         video=video_url,
+        video_embedding=video_embedding,
         text=None,
     )
     results = []
@@ -59,7 +61,15 @@ def main(video_url: str) -> List[VideoAttributes]:
                 milvus_ins, res = future.result()
                 res.milvus_uri = milvus_ins.uri
                 for i in range(len(res.videos)):
+                    # if res.milvus_uri == os.environ.get("DB_URL"):
+                    #     continue
                     # TODO, request to download here
+                    download_file(
+                        res.milvus_uri,
+                        os.path.basename(res.videos[i]),
+                        # "download/" + res.videos[i], # for individual testing
+                        res.videos[i],  # for distributed testing
+                    )
                     video_attributes = VideoAttributes(
                         video_path=res.videos[i],
                         video_embedding=res.video_embeddings[i],
@@ -110,6 +120,14 @@ def init(n_videos: int) -> List[VideoAttributes | None]:
                 logger.info(f"Fetched {len(res)} videos from {url}")
                 for video in res:
                     # TODO, request to download here
+                    # if url == os.environ.get("DB_URL"):
+                    #     continue
+                    download_file(
+                        url,
+                        os.path.basename(video["video"]),
+                        # "download/" + video["video"], # for individual testing
+                        video["video"],  # for distributed testing
+                    )
                     video_attributes = VideoAttributes(
                         video_path=video["video"],
                         video_embedding=video["embeddings_float"],
